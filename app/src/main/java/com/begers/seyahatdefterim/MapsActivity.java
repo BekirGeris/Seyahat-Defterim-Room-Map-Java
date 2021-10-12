@@ -29,7 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -54,19 +54,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         sharedPreferences = MapsActivity.this.getSharedPreferences("com.begers.seyahatdefterim", MODE_PRIVATE);
     }
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(GoogleMap googleMap) { //harita hazır ise
         mMap = googleMap;
+        mMap.setOnMapLongClickListener(this);
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -113,6 +104,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng lastUserLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation, 15));
             }
+
+            mMap.setMyLocationEnabled(true);
         }
     }
 
@@ -135,6 +128,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(MapsActivity.this, "izine ihtiyaçımız var", Toast.LENGTH_LONG).show();
                 }
             }
-        })
+        });
+    }
+
+    @Override
+    public void onMapLongClick(@NonNull LatLng latLng) { //haritaya uzun basıldığın
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(latLng));
     }
 }
